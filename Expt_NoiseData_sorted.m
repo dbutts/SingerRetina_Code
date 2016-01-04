@@ -41,22 +41,33 @@ for ExpR = 1:Nexpts
 	Tcells = find(info.CellTypesNum == CType); % finds all cells of the desired type  
 	Loca = intersect(Gcells, Tcells);  % puts all elements common to Gcells and Tcells in Loca     
 	Ncells = length(Loca);
-		
+	Qs = info.CellQual( Loca );
+	
 	%data.stimtype{TotCells+nn} = stimtype;
 	%fprintf( '\nProcessing Expt 150%s: %d cells\n', int2str(info.EDate(ExpR)), Ncells );
-	fprintf( '%2d: Processing %s: %d cells\n', ExpR, ExptList{ExpR}, Ncells );
+	fprintf( '%2d: Processing %s: %d cells, blocks = ', ExpR, ExptList{ExpR}, Ncells );
+	
+	if isfield( info, 'Nblocks_to_use' )
+		blocks = info.Nblocks_to_use;
+		fprintf( '*' );  % shows there was block info
+	else
+		blocks = 1:length(info.noisefilename);
+	end
+	disp(sprintf('%d ', blocks ))
 	
 	if Ncells > 0
-		for mm = 1:length(info.noisefilename)
+		for mm = blocks
 			if ~isempty(info.noisefilename{mm})
 				%edata = parse_noise_expt([rootdir directory noisefilename(mm)], Loca );
 				% extra parsing for now of squarewave:
 				edata = parse_noise_expt(sprintf('%s%s/%s', rootdir, info.directory(1:end), info.noisefilename{mm}), Loca );
 
 				for nn = 1:Ncells
+					data.cellname{TotCells+nn} = sprintf( '%s C%d', info.EDate , Loca(nn) );
 					data.stiminfo{TotCells+nn}{mm} = info.stimtype(mm);
 					data.spks{TotCells+nn}{mm} = edata.spks{nn};  % Already specific to Loca
-					data.cellname{TotCells+nn} = sprintf( '%s C%d', info.EDate , Loca(nn) );
+					data.Quals(TotCells+nn) = Qs(nn);
+					data.blocks{TotCells+nn} = blocks;
 				end
 			end
 		end	
