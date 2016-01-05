@@ -8,13 +8,17 @@ stimdir = '~/Data/SingerRetina/HopeMouse/ProcessedStimuli';
 %stimdir = '~/ProcessedStimuli';
 
 dt = data.dt;
-Nstims = length(data.stiminfo{cc});
 spks = [];
 stim = [];
 
 if (nargin < 3) || isempty(blocks)
-	blocks = 1:Nstims;
+	if isfield( data, 'blocks' )
+		blocks = data.blocks{cc};
+	else
+		blocks = 1:length(data.stiminfo{cc});
+	end
 end
+Nstims = length(blocks);
 
 fprintf( '%s, %d blocks: ', data.cellname{cc}, Nstims )
 T = 0;
