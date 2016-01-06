@@ -55,7 +55,9 @@ hold on
 for nn = 1:Nplots
 	plot(angs,rs(:,nn),clrs(nn),'LineWidth',1.5)
 	if ~isempty(stds)
-		plot(angs,rs(:,nn)-stds(:,nn),sprintf('%c--',clrs(nn)),'LineWidth',0.5)
+		minstd = rs(:,nn)-stds(:,nn);
+		minstd(minstd < 0) = 0;
+		plot(angs,minstd,sprintf('%c--',clrs(nn)),'LineWidth',0.5)
 		plot(angs,rs(:,nn)+stds(:,nn),sprintf('%c--',clrs(nn)),'LineWidth',0.5)
 	end
 end

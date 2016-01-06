@@ -56,7 +56,9 @@ hold on
 for nn = 1:Nplots
 	polar(angs,rs(:,nn),clrs(nn)); %,'LineWidth',1.5)
 	if ~isempty(stds)
-		polar(angs,rs(:,nn)-stds(:,nn),sprintf('%c--',clrs(nn))); %,'LineWidth',0.5)
+		minstd = rs(:,nn)-stds(:,nn);
+		minstd(minstd < 0) = 0;
+		polar(angs,minstd,sprintf('%c--',clrs(nn))); %,'LineWidth',0.5)
 		polar(angs,rs(:,nn)+stds(:,nn),sprintf('%c--',clrs(nn))); %,'LineWidth',0.5)
 	end
 end

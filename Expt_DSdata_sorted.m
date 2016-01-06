@@ -7,7 +7,10 @@ function DStuning = Expt_DSdata_sorted( CType, Qual, DSbinning )
 %   Qual : Quality of cells (1(= best) to 5) 
 %   DSbinning: Bin-size to calculate std of firing rate
 
-Ndirs = 8;
+% DSexpt order: 0 -90 180 90 45 -135 135 -45 (which was mistakenly 135 again before 1/6/2016)
+DIRorder =     [1   7   5  3  2    6   4   8];
+
+Ndirs = length(DIRorder);
 Nblocks = 300;
 
 if (nargin < 2) || isempty(Qual)                                                                                                      %Defaults to good quality only
@@ -47,6 +50,8 @@ for ExpR = 1:Nexpts
     Loca = intersect(Gcells, Tcells);                                                                                                 %Puts all elements common to Gcells and Tcells in Loca     
 		Ncells = length(Loca);
 		
+		ExptMonth = str2num(info.EDate(1:2));  % assume if after June, then has DS problem
+		
 		%data.stimtype{TotCells+nn} = stimtype;
 		%fprintf( '\nProcessing Expt 150%s: %d cells\n', int2str(info.EDate(ExpR)), Ncells );
 		fprintf( '%2d: Processing %s: %d cells\n', ExpR, ExptList{ExpR}, Ncells );
@@ -83,19 +88,34 @@ for ExpR = 1:Nexpts
 							for dd = 1:Ndirs
 								%Dspks = spks((spks > trgs((dd-1)*Nblocks+1)) & (spks <= (trgs(dd*Nblocks)+dt))) - trgs((dd-1)*Nblocks+1);
 								DIRcount = histc( spks, trgs((dd-1)*Nblocks+1):(DSbinning*1000):trgs(dd*Nblocks)+dt );
-								DStuning{TotCells+nn}.DStun(dd,mm) = sum(DIRcount) / T;
-								DStuning{TotCells+nn}.DSstd(dd,mm) = std(DIRcount) / T;
+								if DIRcount(end) == 0
+									DIRcount = DIRcount(1:end-1);
+								end
+								DStuning{TotCells+nn}.DStun(DIRorder(dd),mm) = mean(DIRcount) / DSbinning;
+								DStuning{TotCells+nn}.DSstd(DIRorder(dd),mm) = std(DIRcount) / DSbinning;
 							end
 						end
 					end
 				end
-				%fprintf('\n');
+				% Correct experiments 7/2015-12/2015 for -45 being replaced by second run of 135
+				if ExptMonth >= 7
+					disp('    Correcting for DS experiment error (-45 -> 135)' )
+					for cc = TotCells+(1:Ncells)
+						extra135mean = DStuning{cc}.DStun(8,:);  extra135std = DStuning{cc}.DSstd(8,:);
+						DStuning{cc}.DStun(8,:) = NaN;           DStuning{cc}.DSstd(8,:) = NaN;
+						DStuning{cc}.DStun(4,:) = (DStuning{cc}.DStun(4,:) + extra135mean)/2;
+						DStuning{cc}.DSstd(4,:) = (DStuning{cc}.DSstd(4,:) + extra135std)/2;
+					end
+				end
+
 			end
 		end
+				
 		TotCells = TotCells + Ncells;
-
 end
 
+
+	
 if TotCells == 0
 	DStuning = [];
 	disp( 'No cells found meeting the criteria.' )
