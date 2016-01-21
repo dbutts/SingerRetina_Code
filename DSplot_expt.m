@@ -18,8 +18,9 @@ for nn = 1:Ncells
 		else
 			DSplot2(DSdata{nn},[Nrows Ncols nn]);
 		end
-		if isfield(DSdata{nn},'type_qual')
-			title(sprintf('Type = %d', DSdata{nn}.type_qual(1) ))
-		end
+		title(DSdata{nn}.cellnames)
+		%if isfield(DSdata{nn},'type_qual')
+			%title(sprintf('Type = %d', DSdata{nn}.type_qual(1) ))
+		%end
 	end
 end

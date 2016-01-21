@@ -61,6 +61,5 @@ for nn = 1:Nplots
 		plot(angs,rs(:,nn)+stds(:,nn),sprintf('%c--',clrs(nn)),'LineWidth',0.5)
 	end
 end
-
-axis tight
-ylim([0 maxamp*1.05])
+set(gca,'XTick',0:45:360,'XTickLabel',{'0',[],'90',[]','180',[],'270',[],'360'})
+axis([0 360 0 maxamp*1.05])
