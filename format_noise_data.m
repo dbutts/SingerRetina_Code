@@ -23,7 +23,7 @@ Nstims = length(blocks);
 fprintf( '%s, %d blocks: ', data.cellname{cc}, Nstims )
 T = 0;
 FRs = [];
-for nn = blocks
+for nn = 1:length(blocks)
 	stimfilename = sprintf('%s/LongStim%d.mat', stimdir, data.stiminfo{cc}{nn} );
 	sdata = load(stimfilename);
 	stim = [stim; sdata.stim;];

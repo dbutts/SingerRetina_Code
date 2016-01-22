@@ -31,7 +31,7 @@ for ctype = 1:length(Ndata)
 			FRs(nn) = length(Ndata{ctype}.spks{cc}{nn})/600;
 		end
 		
-		dFR = diff(FRs) ./ FRs(1:end-1);
+		dFR = abs(diff(FRs)) ./ FRs(1:end-1);
 		if sum(dFR > THRESH_BAD) > 0
 			fprintf( 'V' )
 			if Nblocks == 2
