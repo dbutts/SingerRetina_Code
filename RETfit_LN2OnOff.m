@@ -24,11 +24,14 @@ Rect3fit = OOfit;
 OOfit.subunits(2).kt = -OOfit.subunits(1).kt;
 OOfit = OOfit.fit_TSalt( Robs, modstim, LNstruct.Uindx, 'silent', 1 );
 OOfit = OOfit.correct_spatial_signs();
-fprintf( 'Cell %d:\tLN -> OnOff: %f -> %f\n', cc, LNstruct.LN.fit_props.LL, OOfit.fit_props.LL ); 
+fprintf( 'Cell %d:\tLN -> OnOff: %f -> %f\nRegularizing-T...\n', cc, LNstruct.LN.fit_props.LL, OOfit.fit_props.LL ); 
+OOfit = OOfit.reg_pathT( Robs, modstim, LNstruct.Uindx, LNstruct.XVindx, 'subs', [2 1], 'silent', 1 );
+
 if ~skipReg
-	OOfit = OOfit.reg_pathT( Robs, modstim, LNstruct.Uindx, LNstruct.XVindx, 'subs', [2 1] );
 	OOfit = OOfit.reg_pathSP( Robs, modstim, LNstruct.Uindx, LNstruct.XVindx, 'subs', [2 1] );
+	OOfit = OOfit.reg_pathT( Robs, modstim, LNstruct.Uindx, LNstruct.XVindx );
 end
+
 fitstruct.OnOff = OOfit;
 fitstruct.LLs(2) = OOfit.eval_model( Robs, modstim, LNstruct.XVindx );
 fprintf( '   XV: \t%f -> %f\n', fitstruct.LLs(1), fitstruct.LLs(2) )
