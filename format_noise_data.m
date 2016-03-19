@@ -6,14 +6,23 @@ function [stim,spks,dt] = format_noise_data( data, cc, blocks )
 
 stimdir = '~/Data/SingerRetina/HopeMouse/ProcessedStimuli';
 %stimdir = '~/ProcessedStimuli';
+%stimdir = '/home/hoperetina/data/ProcessedStimuli';
 
 dt = data.dt;
 spks = [];
 stim = [];
 
-if (nargin < 3) || isempty(blocks)
+if nargin < 3
+	blocks = [];
+end
+
+if isempty(blocks)
 	if isfield( data, 'blocks' )
-		blocks = data.blocks{cc};
+		if iscell(data.blocks)
+			blocks = data.blocks{cc};
+		else
+			blocks = data.blocks;
+		end
 	else
 		blocks = 1:length(data.stiminfo{cc});
 	end
