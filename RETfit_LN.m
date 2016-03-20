@@ -6,7 +6,7 @@ if nargin < 4
 	blocks = [];
 end
 
-[stim,spks,dt] = format_noise_data( Ndata, cc, blocks );
+[stim,spks] = format_noise_data( Ndata, cc, blocks );
 fitstruct.cellname = Ndata.cellname{cc};
 
 NT = size(stim,1);
@@ -27,8 +27,11 @@ frac = stim_params.up_fac;
 NX = stim_params.dims(3);
 NY = stim_params.dims(2);
 
+% Format spike data
+Robs = NIM.Spks2Robs( spks, stim_params.dt, NT*frac );
+
 % Spike-triggered average
-sta = mapSTRFsimple( stim, spks, frac, dt );
+sta = sNIM.spike_triggered_average( Robs, stim, stim_params );
 
 % Look at STA in time
 if trimstim
@@ -59,10 +62,6 @@ if size(sta,1) > stim_params.dims(1)
 else
 	sta(end:mod_params.dims(1),:) = 0;
 end
-
-% format data
-Robs = histc( spks, 0:(dt/frac):(NT*dt) ); 
-Robs = Robs(1:size(stim,1)*frac);
 
 % Initialize linear (separable) model
 fitstruct.LLs = [];

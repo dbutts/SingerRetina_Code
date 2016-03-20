@@ -13,14 +13,15 @@ fitstruct = LNstruct;
 frac = LNstruct.LN.stim_params.up_fac;
 [stim,spks,dt] = format_noise_data( Ndata, cc );
 modstim = stim(:,LNstruct.SPindx);
-Robs = histc( spks, 0:(dt/frac):(size(stim,1)*dt) ); 
-Robs = Robs(1:size(stim,1)*frac);
+Robs = NIM.Spks2Robs( spks, fitstruct.LN.stim_params.dt, size(stim,1)*frac );
+%Robs = histc( spks, 0:(dt/frac):(size(stim,1)*dt) ); 
+%Robs = Robs(1:size(stim,1)*frac);
 
 % Build ON-OFF
 OOfit = LNstruct.LN;
 OOfit.subunits(1).NLtype = 'rectlin';
 OOfit.subunits(2) = OOfit.subunits(1);
-Rect3fit = OOfit;
+%Rect3fit = OOfit;
 OOfit.subunits(2).kt = -OOfit.subunits(1).kt;
 OOfit = OOfit.fit_TSalt( Robs, modstim, LNstruct.Uindx, 'silent', 1 );
 OOfit = OOfit.correct_spatial_signs();
