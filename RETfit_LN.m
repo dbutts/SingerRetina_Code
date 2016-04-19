@@ -1,9 +1,16 @@
 function [fitstruct,Robs,modstim,Uindx,XVindx] = RETfit_LN( stim_params, Ndata, cc, blocks, trimstim, skipReg )
 %
 % Usage: [fitstruct,Robs,modstim,Uindx,XVindx] = RETfit_LN( stim_params, Ndata, cc, blocks_to_include, trimstim, skipReg )
+%
+% Use STA to trim stimulus around RF center (10 on each side), and then performs separable-LN fit to
+% generate fitstructure with 
 
 if nargin < 4
-	blocks = [];
+	if ~isempty(Ndata.blocks)
+		blocks = Ndata.blocks{cc};
+	else
+		blocks = [];
+	end
 end
 
 [stim,spks] = format_noise_data( Ndata, cc, blocks );
@@ -73,16 +80,16 @@ sLN = sLN.set_reg_params( 'd2x', 10, 'd2t', 10 );
 
 % Fit Separable LN model
 sLN = sLN.fit_TSalt( Robs, modstim, Uindx, 'silent', 0 );
-sLN = sLN.correct_spatial_signs();
 
 % optimize regularization 
 if ~skipReg
 	sLN = sLN.reg_pathT( Robs, modstim, Uindx, XVindx );
 	sLN = sLN.reg_pathSP( Robs, modstim, Uindx, XVindx );
 end
+sLN = sLN.correct_spatial_signs();
 
 fitstruct.Uindx = Uindx;
 fitstruct.XVindx = XVindx;
-fitstruct.LLs = sLN.eval_model( Robs, modstim, XVindx );
+[LL0,~,~,fitprops] = sLN.eval_model( Robs, modstim, XVindx );
+fitstruct.LLs = LL0-fitprops.nullLL;
 fitstruct.LN = sLN;
-

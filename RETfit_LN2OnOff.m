@@ -2,6 +2,7 @@ function fitstruct = RETfit_LN2OnOff( LNstruct, Ndata, cc, skipReg )
 %
 % Usage: fitstruct = RETfit_LN2OnOff( LNstruct, Ndata, cc, <skipReg> )
 %
+% LNstruct is generated from RETfit_LN, and will add OnOff fit to this struct
 % Default is to skip regularization, since fit will be refined from here
 
 if nargin < 4
@@ -25,7 +26,7 @@ OOfit.subunits(2) = OOfit.subunits(1);
 OOfit.subunits(2).kt = -OOfit.subunits(1).kt;
 OOfit = OOfit.fit_TSalt( Robs, modstim, LNstruct.Uindx, 'silent', 1 );
 OOfit = OOfit.correct_spatial_signs();
-fprintf( 'Cell %d:\tLN -> OnOff: %f -> %f\nRegularizing-T...\n', cc, LNstruct.LN.fit_props.LL, OOfit.fit_props.LL ); 
+fprintf( 'Cell %d:\tLN -> OnOff: %f -> %f (fit-LLs)\nRegularizing-T...\n', cc, LNstruct.LN.fit_props.LL, OOfit.fit_props.LL ); 
 OOfit = OOfit.reg_pathT( Robs, modstim, LNstruct.Uindx, LNstruct.XVindx, 'subs', [2 1], 'silent', 1 );
 
 if ~skipReg
@@ -34,12 +35,15 @@ if ~skipReg
 end
 
 fitstruct.OnOff = OOfit;
-fitstruct.LLs(2) = OOfit.eval_model( Robs, modstim, LNstruct.XVindx );
+[LL2,~,~,fitprops] = OOfit.eval_model( Robs, modstim, LNstruct.XVindx );
+fitstruct.LLs(2) = LL2-fitprops.nullLL;
 fprintf( '   XV: \t%f -> %f\n', fitstruct.LLs(1), fitstruct.LLs(2) )
 
-return;
+return
 
-%% Rect-3 stuff is only useful if not ON-OFF
+
+%% Left over from earlier code;
+% Rect-3 stuff is only useful if not ON-OFF
 Rect3fit.subunits(2).weight = -1;
 Rect3fit.subunits(3) = Rect3fit.subunits(2);
 Rect3fit.subunits(3).kt = -Rect3fit.subunits(3).kt;

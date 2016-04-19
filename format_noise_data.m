@@ -6,6 +6,7 @@ function [stim,spks,dt] = format_noise_data( data, cc, blocks )
 
 stimdir = '~/Data/SingerRetina/HopeMouse/ProcessedStimuli';
 %stimdir = '~/ProcessedStimuli';
+%stimdir = '~/Retina/ProcessedStimuli';
 %stimdir = '/home/hoperetina/data/ProcessedStimuli';
 
 dt = data.dt;
@@ -33,7 +34,13 @@ fprintf( '%s, %d blocks: ', data.cellname{cc}, Nstims )
 T = 0;
 FRs = [];
 for nn = 1:length(blocks)
-	stimfilename = sprintf('%s/LongStim%d.mat', stimdir, data.stiminfo{cc}{nn} );
+	if isfield( data, 'GWNstiminfo' )
+		% Then GWN stimulus (rather than LongStim)
+		stimfilename = sprintf('%s/GWNStim%d.mat', stimdir, data.GWNstiminfo{cc}{nn} );
+	else
+		% Otherwise standard long stimuli
+		stimfilename = sprintf('%s/LongStim%d.mat', stimdir, data.stiminfo{cc}{nn} );
+	end
 	sdata = load(stimfilename);
 	stim = [stim; sdata.stim;];
 	NFR = size(sdata.stim,1);

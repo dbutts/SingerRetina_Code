@@ -12,9 +12,10 @@ for ctype = 1:length(Ndata)
 			if blocks(1) > 0
 				Ncells = Ncells + 1;
 				NdataMod{ctype}.cellname{Ncells} = Ndata{ctype}.cellname{cc};
-				NdataMod{ctype}.Quals(Ncells) = Ndata{ctype}.Quals(cc);
 				NdataMod{ctype}.stiminfo{Ncells}{length(blocks)} = [];
 				NdataMod{ctype}.spks{Ncells}{length(blocks)} = [];
+				NdataMod{ctype}.cell_types(Ncells) = Ndata{ctype}.cell_types(cc);
+				NdataMod{ctype}.sort_qual(Ncells) = Ndata{ctype}.sort_qual(cc);
 				NdataMod{ctype}.blocks{Ncells} = blocks;
 				for nn = 1:length(blocks)
 					NdataMod{ctype}.stiminfo{Ncells}{nn} = Ndata{ctype}.stiminfo{cc}{blocks(nn)};
