@@ -50,7 +50,8 @@ for nn = 1:length(clone)
 	fit0.subunits(clone(nn)).NLtype = 'rectlin';
 	fit0.subunits(clone(end)+nn) = fit0.subunits(nn);
 	fit0.subunits(clone(end)+nn).NLtype = 'rectlin';
-	fit0.subunits(clone(end)+nn).weight = -1;
+    fit0.subunits(clone(end)+nn).kt = fit0.subunits(nn).timeshift_kts(3); %temporal kernel delay 
+	fit0.subunits(clone(end)+nn).weight = -1; %suppressive unit 
 end
 
 fit1 = fit0.fit_TSalt( Robs, modstim, fitstruct.Uindx, 'fit_offsets', 1 );
@@ -66,3 +67,4 @@ end
 newstruct.LLs(end+1) = LLnew-fitprops.nullLL;
 newstruct.SupFit = fit1;
 fprintf( '           XV: %f -> %f\n', max(fitstruct.LLs), newstruct.LLs(end) )
+
