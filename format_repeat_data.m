@@ -3,6 +3,7 @@ function [stim,REPspks,dt] = format_repeat_data( data, cc )
 % Usage: [Rstim,REPspks,dt] = format_repeat_data( data, cc )
 
 stimdir = '~/Data/SingerRetina/HopeMouse/ProcessedStimuli';
+%stimdir = '/home/hoperetina/data/ProcessedStimuli';
 
 dt = data.dt;
 Nstims = length(data.repinfo{cc});

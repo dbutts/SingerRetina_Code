@@ -7,7 +7,11 @@ function [fitstruct,Robs,modstim,Uindx,XVindx] = RETfit_LN( stim_params, Ndata, 
 
 if nargin < 4
 	if ~isempty(Ndata.blocks)
-		blocks = Ndata.blocks{cc};
+		if iscell(Ndata.blocks)
+			blocks = Ndata.blocks{cc};
+		else
+			blocks = Ndata.blocks;
+		end
 	else
 		blocks = [];
 	end
