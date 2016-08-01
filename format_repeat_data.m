@@ -1,12 +1,16 @@
-function [stim,REPspks,dt] = format_repeat_data( data, cc )
+function [stim,REPspks,dt] = format_repeat_data( data, cc, blocks_to_use )
 %
-% Usage: [Rstim,REPspks,dt] = format_repeat_data( data, cc )
+% Usage: [Rstim,REPspks,dt] = format_repeat_data( data, cc, <blocks_to_use> )
 
 stimdir = '~/Data/SingerRetina/HopeMouse/ProcessedStimuli';
 %stimdir = '/home/hoperetina/data/ProcessedStimuli';
 
 dt = data.dt;
 Nstims = length(data.repinfo{cc});
+if nargin < 3
+	blocks_to_use = 1:Nstims;
+end
+
 if Nstims == 0
 	fprintf( 'No repeat data for cell %d\n', cc );
 	stim = [];
@@ -20,7 +24,7 @@ stim = [];
 
 REPspks = [];
 
-for nn = 1:Nstims
+for nn = blocks_to_use
 	repfilename = sprintf('%s/RepStim%d.mat', stimdir, data.repinfo{cc}{nn} );
 	sdata = load(repfilename);
 	stim = [stim; sdata.Rstim;];
