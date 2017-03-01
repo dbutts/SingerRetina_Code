@@ -21,7 +21,11 @@ for ctype = 1:length(Ndata)
 	fprintf( 'Type = %d:\n', ctype ) 
 	for cc = 1:length(Ndata{ctype}.cellname)
 		
-		Nblocks = length(Ndata{ctype}.stiminfo{cc});
+		if ~isfield(Ndata{ctype},'stiminfo')
+			Nblocks = length(Ndata{ctype}.GWNstiminfo{cc});
+		else
+			Nblocks = length(Ndata{ctype}.stiminfo{cc});
+		end
 		ValBlocks{ctype}{cc} = 1:Nblocks;
 		fprintf( '  Cell %2d: %d blocks.  ', cc, Nblocks );
 		

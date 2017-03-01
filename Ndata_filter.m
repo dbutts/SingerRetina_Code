@@ -18,7 +18,11 @@ for ctype = 1:length(Ndata)
 				NdataMod{ctype}.sort_qual(Ncells) = Ndata{ctype}.sort_qual(cc);
 				NdataMod{ctype}.blocks{Ncells} = blocks;
 				for nn = 1:length(blocks)
-					NdataMod{ctype}.stiminfo{Ncells}{nn} = Ndata{ctype}.stiminfo{cc}{blocks(nn)};
+					if ~isfield(Ndata{ctype},'stiminfo')
+						NdataMod{ctype}.GWNstiminfo{Ncells}{nn} = Ndata{ctype}.GWNstiminfo{cc}{blocks(nn)};
+					else
+						NdataMod{ctype}.stiminfo{Ncells}{nn} = Ndata{ctype}.stiminfo{cc}{blocks(nn)};
+					end
 					NdataMod{ctype}.spks{Ncells}{nn} = Ndata{ctype}.spks{cc}{blocks(nn)};
 				end
 			end

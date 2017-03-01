@@ -12,6 +12,7 @@ info = ExptInfo;
 Gcells = find(info.CellQual <= MinSortQual);   % finds all cells of the desired quality    
 Ncells = length(Gcells);
 assert( Ncells > 0, 'No cells in experiment met criteria.' )
+assert( isfield(info,'repfilenames'), 'No rep-files in this experiment.' )
 
 NT = 600; % stimulus size for the repeats            
 
