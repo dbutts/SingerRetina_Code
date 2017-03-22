@@ -9,7 +9,7 @@ function [SpPar, Ksm, Gparams] = DoCovFitImage( Ksp, NyNx, Ncov, plotresults, in
 %   Ksp: filter to fit as one-D array, which will be reshaped using NyNx
 %   NyNx: [NY NX] dimensions of filter
 %   Ncov: whether to fit single Gaussian (1) or DoG (2) to the image
-%   plotresults: want to plot the results, set to 1
+%   plotresults: want to plot the results, set to 1. Make 2 if want to see fitted comparison.
 %   initialseg: initial guess for parameters
 % Outputs:
 %   SpPar: parameters of fit: cntr [y0 x0], COV [P1 P2 P3], amplitude
@@ -84,17 +84,17 @@ if Ncov > 1
 end
 
 % Calculate major and minor axis  and real widths
-SpPar.stdevs_xy = 1./sqrt(SpPar.COV(:,1:2)/2);
+SpPar.stdevs_xy = 1./sqrt(2*SpPar.COV(:,1:2));
 C = [SpPar.COV(1,[1 3]); SpPar.COV(1,[3 2]);];
 [V,D] = eig(C);
-SpPar.stdevs = 1./sqrt(diag(D)/2)';
+SpPar.stdevs = 1./sqrt(2*diag(D))';
 SpPar.major_axis = V(:,1)';
 SpPar.angle = 180/pi * atan(V(2,1)/V(1,1));
 
 if Ncov > 1
 	C = [SpPar.COV(2,[1 3]); SpPar.COV(2,[3 2]);];
 	[V,D] = eig(C);
-	SpPar.stdevs(2,:) = 1./sqrt(diag(D)/2)';
+	SpPar.stdevs(2,:) = 1/sqrt(2*diag(D))';
 	SpPar.major_axis(2,:) = V(:,1)';
 	SpPar.angle(2) = 180/pi * atan(V(2,1)/V(1,1));
 end
@@ -102,21 +102,50 @@ end
 Ksm = Ksm(:);
 
 if plotresults
+	if plotresults > 1
+		Ncol = 2;
+	else 
+		Ncol = 1;
+	end
+	
+	% Make ellipse: gotta be a better way...
+	C = [SpPar.COV(1,[1 3]); SpPar.COV(1,[3 2]);];
+	thetas = (0:64)/(64)*2*pi;
+	rs = zeros(1,length(thetas));
+	for nn = 1:length(thetas)
+		%rs(nn) = ( SpPar.COV(1)*(cos(thetas(nn))^2) + 2*SpPar.COV(3)*cos(thetas(nn))*sin(thetas(nn)) + SpPar.COV(2)*(sin(thetas(nn))^2) )^(-0.5);
+		v = [cos(thetas(nn)) sin(thetas(nn))];
+		rs(nn) = (2*v*C*v')^(-0.5);
+	end		
+	xs = SpPar.cntr(1)+1 + rs.*cos(thetas);
+	ys = SpPar.cntr(2)+1 + rs.*sin(thetas);
+	
 	figure; 
-	subplot(2,2,1)
+	subplot(2,Ncol,1); colormap gray
 	imagesc(reshape(Ksp,NY,NX)/max(abs(Ksp))',[-1 1])
 	title('Initial')
-	subplot(2,2,2)
-	imagesc(reshape(Ksm,NY,NX)/max(abs(Ksm))',[-1 1])
-	title('Smoothed')
-	subplot(2,2,1)
-
-	subplot(2,2,3)
+	hold on
+	plot(xs,ys,'r','LineWidth',0.5);
+	if NY == NX, axis square; end
+	
+	subplot(2,Ncol,Ncol+1)
 	plot(reshape(Ksp,NY,NX)')
 	xlim([1 NX])
-	subplot(2,2,4)
-	plot(reshape(Ksm,NY,NX)')
-	xlim([1 NX])
+	if NY == NX, axis square; end
+
+	if plotresults > 1
+		subplot(2,Ncol,2); colormap gray
+		imagesc(reshape(Ksm,NY,NX)/max(abs(Ksm))',[-1 1])
+		title('Smoothed')
+		hold on
+		plot(xs,ys,'r','LineWidth',0.5);
+		if NY == NX, axis square; end
+	
+		subplot(2,Ncol,4)
+		plot(reshape(Ksm,NY,NX)')
+		xlim([1 NX])
+		if NY == NX, axis square; end
+	end
 end
 
 end
