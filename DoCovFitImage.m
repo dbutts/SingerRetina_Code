@@ -1,6 +1,6 @@
 function [SpPar, Ksm, Gparams] = DoCovFitImage( Ksp, NyNx, Ncov, plotresults, initialseg )
 %
-% Usage: [SpPar, Ksm] = DoCovFitImage( Ksp, NyNx, <Ncov>, <plotresults>, <initialseg> )
+% Usage: [SpPar, Ksm, Gparams] = DoCovFitImage( Ksp, NyNx, <Ncov>, <plotresults>, <initialseg> )
 % 
 % Fits elliptical Gaussian (or difference-of-Gaussians) using mean-squared error to the image:
 %  g = exp( -(P1*(x-x0)^2) + P2*(y-y0)^2) + P3*xy )
@@ -30,8 +30,8 @@ NX = NyNx(2);  NY = NyNx(1);
 
 % Minimize mean-squared error with single Gaussian fit
 [A,ctr] = max(Ksp);
-Cx = floor((ctr-1)/NY)+1;
-Cy = mod(ctr-1,NY)+1;
+Cx = floor((ctr-1)/NY); %+1;
+Cy = mod(ctr-1,NY); %+1;
 
 % Initial conditions
 if Ncov == 1 
@@ -87,7 +87,11 @@ end
 SpPar.stdevs_xy = 1./sqrt(2*SpPar.COV(:,1:2));
 C = [SpPar.COV(1,[1 3]); SpPar.COV(1,[3 2]);];
 [V,D] = eig(C);
-SpPar.stdevs = 1./sqrt(2*diag(D))';
+if sum(diag(D) < 0) > 0
+	SpPar.stdevs = [0 0];
+else
+	SpPar.stdevs = 1./sqrt(2*diag(D))';
+end
 SpPar.major_axis = V(:,1)';
 SpPar.angle = 180/pi * atan(V(2,1)/V(1,1));
 
@@ -117,8 +121,11 @@ if plotresults
 		v = [cos(thetas(nn)) sin(thetas(nn))];
 		rs(nn) = (2*v*C*v')^(-0.5);
 	end		
-	xs = SpPar.cntr(1)+1 + rs.*cos(thetas);
-	ys = SpPar.cntr(2)+1 + rs.*sin(thetas);
+	
+	FRAC_HEIGHT = 0.5; % ellipse at what level of Gaussian?
+	xs = SpPar.cntr(1)+1 + sqrt(-2*log(FRAC_HEIGHT))*rs.*sin(thetas);
+	ys = SpPar.cntr(2)+1 + sqrt(-2*log(FRAC_HEIGHT))*rs.*cos(thetas);
+	
 	
 	figure; 
 	subplot(2,Ncol,1); colormap gray
@@ -126,6 +133,7 @@ if plotresults
 	title('Initial')
 	hold on
 	plot(xs,ys,'r','LineWidth',0.5);
+	plot(SpPar.cntr(1)+1,SpPar.cntr(2)+1,'rx')
 	if NY == NX, axis square; end
 	
 	subplot(2,Ncol,Ncol+1)

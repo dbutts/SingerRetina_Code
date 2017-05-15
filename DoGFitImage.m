@@ -84,19 +84,49 @@ if Ncov > 1
 	end
 end
 
-SpPar.stdevs = 1./sqrt(SpPar.COV/2);
+SpPar.stdevs = 1./sqrt(2*SpPar.COV);
 
 Ksm = Ksm(:);
 
 if plotresults
+
+	
+	FRAC_HEIGHT = 1/3; % ellipse at what level of Gaussian?
+	thetas = (0:64)/(64)*2*pi;
+
+	xs = SpPar.cntr(1)+1 + sqrt(-2*log(FRAC_HEIGHT))*SpPar.stdevs*sin(thetas);
+	ys = SpPar.cntr(2)+1 + sqrt(-2*log(FRAC_HEIGHT))*SpPar.stdevs*cos(thetas);
+	
+% 	
+% 	figure; 
+% 	subplot(2,Ncol,1); colormap gray
+% 	imagesc(reshape(Ksp,NY,NX)/max(abs(Ksp))',[-1 1])
+% 	title('Initial')
+% 	hold on
+% 	plot(xs,ys,'r','LineWidth',0.5);
+% 	plot(SpPar.cntr(1)+1,SpPar.cntr(2)+1,'rx')
+% 	if NY == NX, axis square; end
+
+	
+	
 	figure; 
-	subplot(2,2,1)
+	subplot(2,2,1); colormap gray
 	imagesc(reshape(Ksp,NY,NX)/max(abs(Ksp))',[-1 1])
+	hold on
+	plot(xs,ys,'r','LineWidth',0.5);
+	plot(SpPar.cntr(1)+1,SpPar.cntr(2)+1,'rx')
+	if NY == NX, axis square; end
+	axis tight
 	title('Initial')
-	subplot(2,2,2)
+	
+	subplot(2,2,2); colormap gray
 	imagesc(reshape(Ksm,NY,NX)/max(abs(Ksm))',[-1 1])
+	hold on
+	plot(xs,ys,'r','LineWidth',0.5);
+	plot(SpPar.cntr(1)+1,SpPar.cntr(2)+1,'rx')
+	if NY == NX, axis square; end
+	axis tight
 	title('Smoothed')
-	subplot(2,2,1)
 
 	subplot(2,2,3)
 	plot(reshape(Ksp,NY,NX)')
