@@ -6,9 +6,20 @@ stimdir = '~/Data/SingerRetina/HopeMouse/ProcessedStimuli';
 %stimdir = '/home/hoperetina/data/ProcessedStimuli';
 
 dt = data.dt;
+stim = [];
+REPspks = [];
+
 if isfield( data, 'repinfo' )
+	if cc > length(data.repinfo)
+		fprintf( 'No repeat data for cell %d\n', cc );
+		return
+	end
 	Nstims = length(data.repinfo{cc});
 else
+	if cc > length(data.REPinfo)
+		fprintf( 'No repeat data for cell %d\n', cc );
+		return
+	end
 	Nstims = length(data.REPinfo{cc});
 end
 if nargin < 3
@@ -17,13 +28,10 @@ end
 
 if Nstims == 0
 	fprintf( 'No repeat data for cell %d\n', cc );
-	stim = [];
-	spks = [];
-	return;
+	return
 end
 
 fprintf( '%s: %d blocks.\n', data.cellname{cc}, Nstims );
-spks = [];
 stim = [];
 
 REPspks = [];

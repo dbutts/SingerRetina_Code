@@ -45,7 +45,7 @@ for nn = 1:length(blocks)
 	stim = [stim; sdata.stim;];
 	NFR = size(sdata.stim,1);
 
-	rspks = data.spks{cc}{nn};
+	rspks = data.spks{cc}{blocks(nn)};
 	rspks = rspks((rspks > 0) & (rspks < (NFR*dt)));
 	FRs(end+1) = length(rspks)/(size(sdata.stim,1)*dt);
 	fprintf( ' %0.2f Hz  ', FRs(end) );
