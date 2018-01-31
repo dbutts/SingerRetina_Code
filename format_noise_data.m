@@ -36,10 +36,10 @@ FRs = [];
 for nn = 1:length(blocks)
 	if isfield( data, 'GWNstiminfo' )
 		% Then GWN stimulus (rather than LongStim)
-		stimfilename = sprintf('%s/GWNStim%d.mat', stimdir, data.GWNstiminfo{cc}{nn} );
+		stimfilename = sprintf('%s/GWNStim%d.mat', stimdir, data.GWNstiminfo{cc}{blocks(nn)} );
 	else
 		% Otherwise standard long stimuli
-		stimfilename = sprintf('%s/LongStim%d.mat', stimdir, data.stiminfo{cc}{nn} );
+		stimfilename = sprintf('%s/LongStim%d.mat', stimdir, data.stiminfo{cc}{blocks(nn)} );
 	end
 	sdata = load(stimfilename);
 	stim = [stim; sdata.stim;];
